@@ -45,10 +45,9 @@ c
 "
 subroutine
    glasso(nn,sss,rrho,ia,is,itr,ipen,thr,maxit,www,wwwi,nniter,ddel,jerr);
-implicit double precision(a-h,o-z);
-double precision sss(nn,nn),rrho(nn,nn),www(nn,nn),wwwi(nn,nn);
+real sss(nn,nn),rrho(nn,nn),www(nn,nn),wwwi(nn,nn);
 %fortran
-      double precision, dimension (:), allocatable :: ss,rho,ww,wwi
+      real, dimension (:), allocatable :: ss,rho,ww,wwi
       integer, dimension (:), allocatable :: ir,ie
       integer, dimension (:,:), allocatable :: ic
 %mortran
@@ -104,8 +103,7 @@ if ia.eq.0 <
 return;
 end;
 subroutine connect(n,ss,rho,nc,ic,ir,ie);
-implicit double precision(a-h,o-z);
-double precision ss(n,n),rho(n,n); integer ic(2,n),ir(n),ie(n);
+real ss(n,n),rho(n,n); integer ic(2,n),ir(n),ie(n);
 ie=0; nc=0; is=1;
 <k=1,n; if(ie(k).gt.0) next;
    ir(is)=k; nc=nc+1; ie(k)=nc; ic(1,nc)=is; is=is+1;
@@ -120,8 +118,7 @@ ie=0; nc=0; is=1;
 return;
 end;
 subroutine row(nc,nr,jr,n,ss,rho,ie,na,kr);
-implicit double precision(a-h,o-z);
-double precision ss(n,n),rho(n,n); integer jr(nr),ie(n),kr(*"na");
+real ss(n,n),rho(n,n); integer jr(nr),ie(n),kr(*"na");
 na=0;
 <l=1,nr; k=jr(l);
    <j=1,n; if(ie(j).gt.0) next; if(j.eq.k) next;
@@ -132,12 +129,11 @@ na=0;
 return;
 end;  
 subroutine lasinv1(n,ss,rho,ia,is,itr,ipen,thr,maxit,ww,wwi,niter,del,jerr);
-implicit double precision(a-h,o-z);
 parameter(eps=1.0e-7);
-double precision ss(n,n),rho(n,n),ww(n,n),wwi(n,n);
+real ss(n,n),rho(n,n),ww(n,n),wwi(n,n);
 %fortran
-      double precision, dimension (:,:), allocatable :: vv,xs
-      double precision, dimension (:), allocatable :: s,x,z,ws,ro,so
+      real, dimension (:,:), allocatable :: vv,xs
+      real, dimension (:), allocatable :: s,x,z,ws,ro,so
       integer, dimension (:), allocatable :: mm
       nm1=n-1
       allocate(vv(1:nm1,1:nm1),stat=jerr)
@@ -201,8 +197,7 @@ del=dlx/nm1; call inv(n,ww,xs,wwi);
 return;
 end;
 subroutine setup(m,n,ss,rho,ww,vv,s,r);
-implicit double precision(a-h,o-z);
-double precision ss(n,n),rho(n,n),ww(n,n),vv(n-1,n-1),s(n-1),r(n-1);
+real ss(n,n),rho(n,n),ww(n,n),vv(n-1,n-1),s(n-1),r(n-1);
 l=0;
 <j=1,n; if(j.eq.m) next; l=l+1; r(l)=rho(j,m); s(l)=ss(j,m); i=0;
    <k=1,n; if(k.eq.m) next; i=i+1; vv(i,l)=ww(k,j);>
@@ -210,8 +205,7 @@ l=0;
 return;
 end;  
 subroutine lasso(rho,n,vv,s,thr,x,z,mm);
-implicit double precision(a-h,o-z);
-double precision rho(n),vv(n,n),s(n),x(n),z(n); integer mm(n);
+real rho(n),vv(n,n),s(n),x(n),z(n); integer mm(n);
 call fatmul(2,n,vv,x,s,z,mm);
 loop < dlx=0.0;
    <j=1,n; xj=x(j); x(j)=0.0; t=s(j)+vv(j,j)*xj;
@@ -223,9 +217,8 @@ loop < dlx=0.0;
 return;
 end;
 subroutine fatmul(it,n,vv,x,s,z,m);
-implicit double precision(a-h,o-z);
 parameter(fac=0.2);
-double precision vv(n,n),x(n),s(n),z(n); integer m(n);
+real vv(n,n),x(n),s(n),z(n); integer m(n);
 l=0;
 <j=1,n; if(x(j).eq.0.0) next; l=l+1; m(l)=j; z(l)=x(j);>
 if l.gt.int(fac*n) <
@@ -236,8 +229,7 @@ else < <j=1,n; s(j)=s(j)-dot_product(vv(m(1:l),j),z(1:l));>>
 return;
 end;
 subroutine inv(n,ww,xs,wwi);
-implicit double precision(a-h,o-z);
-double precision ww(n,n),xs(n-1,n),wwi(n,n);
+real ww(n,n),xs(n-1,n),wwi(n,n);
 nm1=n-1; xs=-xs;
 wwi(1,1)=1.0/(ww(1,1)+dot_product(xs(:,1),ww(2:n,1)));
 wwi(2:n,1)=wwi(1,1)*xs(:,1);
@@ -253,11 +245,10 @@ return;
 end;
 
 subroutine glassopath(beta,what,jerrs,rholist,nrho,n,ss,rho,ia,itr,
-		      ipen,thr,maxit,ww,wwi,niter,del,jerr);
-implicit double precision(a-h,o-z);
+ipen,thr,maxit,ww,wwi,niter,del,jerr);
 integer nrho,n,jerrs(nrho);
-double precision rholist(nrho),beta(n,n,nrho),what(n,n,nrho);
-double precision ss(n,n),rho(n,n),ww(n,n),wwi(n,n);
+real rholist(nrho),beta(n,n,nrho),what(n,n,nrho);
+real ss(n,n),rho(n,n),ww(n,n),wwi(n,n);
 
 is=0;
 <
